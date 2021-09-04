@@ -93,7 +93,25 @@ class DelayOsc extends Piece {
         this.dBG.connect( this.d1.delay.delayTime );
         this.oB.connect( this.d1 );
 
+        this.p1 = new SemiOpenPipe( 1000 );
+        this.p2 = new SemiOpenPipe( 2000 );
+
+        this.pD1 = new Effect();
+        this.pD2 = new Effect();
+        this.pD1.randomShortDelay();
+        this.pD2.randomShortDelay();
+        this.pD1.on();
+        this.pD2.on();
+
         this.d1.connect( this.output );
+
+        this.d1.connect( this.p1 );
+        this.p1.connect( this.pD1 );
+        this.pD1.connect( this.output );
+
+        this.d1.connect( this.p2 );
+        this.p2.connect( this.pD2 );
+        this.pD2.connect( this.output );
 
         this.output.gain.gain.value = 0.05;
 
