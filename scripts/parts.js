@@ -27,8 +27,8 @@ class Piece {
 
     load(){
 
-        this.dO = new DelayOsc( this );
-        this.dO.load();
+        this.dO1 = new DelayOsc( this );
+        this.dO1.load2();
 
     }
 
@@ -37,7 +37,7 @@ class Piece {
         this.fadeFilter.start(1, 50);
 		this.globalNow = audioCtx.currentTime;
 
-        this.dO.play();
+        this.dO1.play();
 
 
     }
@@ -63,7 +63,7 @@ class DelayOsc extends Piece {
 
     }
 
-    load() {
+    load1() {
 
         this.d1 = new MyDelay( 0 , 0);
 
@@ -93,6 +93,8 @@ class DelayOsc extends Piece {
         this.dBG.connect( this.d1.delay.delayTime );
         this.oB.connect( this.d1 );
 
+        // FX
+
         this.p1 = new SemiOpenPipe( 1000 );
         this.p2 = new SemiOpenPipe( 2000 );
 
@@ -103,6 +105,11 @@ class DelayOsc extends Piece {
         this.pD1.on();
         this.pD2.on();
 
+        this.s = new SchwaBox( 'ae' );
+        this.s.output.gain.value = 0.0125;
+
+        // CONNECTIONS
+
         this.d1.connect( this.output );
 
         this.d1.connect( this.p1 );
@@ -112,6 +119,52 @@ class DelayOsc extends Piece {
         this.d1.connect( this.p2 );
         this.p2.connect( this.pD2 );
         this.pD2.connect( this.output );
+
+        this.d1.connect( this.s );
+
+        this.s.connect( this.output );
+
+        this.output.gain.gain.value = 0.05;
+
+    }
+
+    load2() {
+
+        this.d1 = new MyDelay( 0 , 0);
+
+        this.oB = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+        this.oB.sine( 1 , 1 ).fill( 0 );
+        this.oB.playbackRate = 20;
+        this.oB.loop = true;
+
+        this.dB = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+
+        for( let i = 0 ; i < 5 ; i++ ){
+
+            this.dB.fm( randomInt( 1 , 20 ) , randomInt( 1 , 20 ) , randomInt( 0.1 , 0.5 ) , randomFloat( 0.1 , 1 ) ).add( 0 );
+
+        }
+
+        this.dB.normalize( -1 , 1 );
+
+        this.dB.constant( 1 ).add( 0 );
+        this.dB.constant( 0.03125 ).multiply( 0 );
+        this.dB.playbackRate = 20;
+        this.dB.loop = true;
+
+        this.dBG = new MyGain( 0 );
+        this.dBGO = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+        this.dBGO.ramp( 0 , 1 , 0.01 , 0.015 , 0.1 , 8 ).add( 0 );
+        this.dBGO.playbackRate = 1;
+        this.dBGO.loop = true;
+
+        this.dB.connect( this.dBG ); this.dBGO.connect( this.dBG.gain.gain );
+        this.dBG.connect( this.d1.delay.delayTime );
+        this.oB.connect( this.d1 );
+
+        // CONNECTIONS
+
+        this.d1.connect( this.output );
 
         this.output.gain.gain.value = 0.05;
 
