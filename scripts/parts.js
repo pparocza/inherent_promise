@@ -28,7 +28,7 @@ class Piece {
     load(){
 
         this.dO1 = new DelayOsc( this );
-        this.dO1.load2();
+        this.dO1.load4();
 
     }
 
@@ -170,10 +170,105 @@ class DelayOsc extends Piece {
 
     }
 
+    load3() {
+
+        this.d1 = new MyDelay( 0 , 0);
+
+        this.oB = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+        this.oB.sine( 1 , 1 ).fill( 0 );
+        this.oB.playbackRate = 40;
+        this.oB.loop = true;
+
+        this.dB = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+
+        for( let i = 0 ; i < 10 ; i++ ){
+
+            this.dB.fm( randomInt( 1 , 20 ) , randomInt( 1 , 20 ) , randomInt( 0.1 , 0.5 ) , randomFloat( 0.1 , 1 ) ).add( 0 );
+
+        }
+
+        this.dB.normalize( -1 , 1 );
+
+        this.dB.constant( 1 ).add( 0 );
+        this.dB.constant( 0.03125 ).multiply( 0 );
+        this.dB.playbackRate = 10;
+        this.dB.loop = true;
+
+        this.dBG = new MyGain( 0 );
+        this.dBGO = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+        this.dBGO.ramp( 0 , 1 , 0.5 , 0.5 , 1 , 1 ).add( 0 );
+        this.dBGO.playbackRate = 0.25;
+        this.dBGO.loop = true;
+
+        this.dB.connect( this.dBG ); this.dBGO.connect( this.dBG.gain.gain );
+        this.dBG.connect( this.d1.delay.delayTime );
+        this.oB.connect( this.d1 );
+
+        // CONNECTIONS
+
+        this.d1.connect( this.output );
+
+        this.output.gain.gain.value = 0.05;
+
+    }
+
+    load4() {
+
+        this.d1 = new MyDelay( 0 , 0);
+
+        this.oB = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+        this.oB.sine( 1 , 1 ).fill( 0 );
+        this.oB.playbackRate = 120;
+        this.oB.loop = true;
+
+        this.dB = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+
+        for( let i = 0 ; i < 20 ; i++ ){
+
+            this.dB.sine( randomFloat( 1 , 100 ) , randomFloat( 0.1 , 1 ) ).add( 0 );
+
+        }
+
+        this.dB.normalize( -1 , 1 );
+
+        this.dB.constant( 1 ).add( 0 );
+        this.dB.constant( 0.03125 ).multiply( 0 );
+        this.dB.playbackRate = 100;
+        this.dB.loop = true;
+
+        this.dBG = new MyGain( 0 );
+        this.dBGO = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+        this.dBGO.ramp( 0 , 1 , 0.01 , 0.015 , 0.1 , 8 ).add( 0 );
+        this.dBGO.playbackRate = 1;
+        this.dBGO.loop = true;
+
+        this.aB = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+        this.aB.ramp( 0 , 1 , 0.01 , 0.015 , 0.1 , 8).add( 0 );
+        this.aB.constant( 1 ).multiply( 0 );
+        this.aB.playbackRate = 1;
+        this.aB.loop = true;
+
+        this.aG = new MyGain( 0 );
+
+        this.dB.connect( this.dBG ); this.dBGO.connect( this.dBG.gain.gain );
+        this.dBG.connect( this.d1.delay.delayTime );
+
+        this.oB.connect( this.aG ); this.aB.connect( this.aG.gain.gain );
+        this.aG.connect( this.d1 );
+
+        // CONNECTIONS
+
+        this.d1.connect( this.output );
+
+        this.output.gain.gain.value = 0.05;
+
+    }
+
     play() {
 
         this.oB.start();
         this.dB.start();
+        this.aB.start();
         this.dBGO.start();
 
     }
