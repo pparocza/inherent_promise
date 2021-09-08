@@ -28,7 +28,7 @@ class Piece {
     load(){
 
         this.dO1 = new DelayOsc( this );
-        this.dO1.load9();
+        this.dO1.load10();
 
     }
 
@@ -529,6 +529,67 @@ class DelayOsc extends Piece {
 
         this.fO = new MyOsc( 'sine' , 0 );
         this.fOG = new MyGain( 1000 );
+
+        this.aG = new MyGain( 0 );
+
+        // CONNECTIONS
+
+        this.d1.connect( this.fOG );
+        this.fOG.connect( this.fO.frequencyInlet );
+        this.fO.connect( this.aG ); this.dBGO.connect( this.aG.gain.gain );
+        this.aG.connect( this.output );
+
+        this.output.gain.gain.value = 0.15;
+
+    }
+
+    load10() {
+
+        this.fund = 80;
+
+        this.d1 = new MyDelay( 0 , 0);
+
+        this.oB = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+        
+        this.oB.sine( 1 , 1 ).fill( 0 );
+        this.oB.sine( 2 , 1 ).fill( 0 );
+        this.oB.sine( 0.25 , 1 ).fill( 0 );
+        this.oB.sine( 0.5 , 1 ).fill( 0 );
+        this.oB.sine( 3 , 1 ).fill( 0 );
+        this.oB.sine( 5 , 1 ).fill( 0 );
+
+        this.oB.normalize( -1 , 1 );
+
+        this.oB.playbackRate = this.fund;
+        this.oB.loop = true;
+
+        this.dB = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+
+        for( let i = 0 ; i < 10 ; i++ ){
+
+            this.dB.fm( this.fund * randomArrayValue( [ 1 , P5 , 2 ] ) , this.fund * randomArrayValue( [ 1 , P5 , 2 ] ) , randomInt( 0.1 , 0.25 ) , randomFloat( 0.1 , 1 ) ).add( 0 );
+
+        }
+
+        this.dB.normalize( -1 , 1 );
+
+        this.dB.constant( 1 ).add( 0 );
+        this.dB.constant( 0.03125 ).multiply( 0 );
+        this.dB.playbackRate = 80;
+        this.dB.loop = true;
+
+        this.dBG = new MyGain( 0 );
+        this.dBGO = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+        this.dBGO.ramp( 0 , 1 , 0.01 , 0.015 , 0.5 , 8 ).add( 0 );
+        this.dBGO.playbackRate = 0.25;
+        this.dBGO.loop = true;
+
+        this.dB.connect( this.dBG ); this.dBGO.connect( this.dBG.gain.gain );
+        this.dBG.connect( this.d1.delay.delayTime );
+        this.oB.connect( this.d1 );
+
+        this.fO = new MyOsc( 'sine' , 0 );
+        this.fOG = new MyGain( 200 );
 
         this.aG = new MyGain( 0 );
 
