@@ -128,12 +128,19 @@ class Piece {
     loadLoad15ExperimentsSus(){
 
         const onsetRate = 0.25;
-        const gainVal = 0.15
+        const nDOS = 4;
+        const gainVal = 0.15 / nDOS;
+
+        this.dOSA = [];
 
         // fund , iArray , modRate , envelopeRate , modWidth , gainVal
 
-        this.dOS1 = new DelayOsc( this );
-        this.dOS1.load15ArgsB( 80 , [ 1 , 1.1 , 1.2 , 1.3 , 1.4 ] , 40 , onsetRate , 2000 , gainVal * 0.3 );
+        for( let i = 0 ; i < nDOS ; i++ ){
+
+            this.dOSA[i] = new DelayOsc( this );
+            this.dOSA[i].load15ArgsB( randomFloat( 20 , 1000 ) , [ 1 , 1.1 , 1.2 , 1.3 , 1.4 ] , randomFloat( 40 , 200 ) , onsetRate * randomFloat( 0.125 , 1 ) , randomFloat( 400 , 2000 ) , gainVal );
+
+        }
 
     }
 
@@ -153,7 +160,9 @@ class Piece {
 
     startLoad15ExperimentsSus(){
 
-        this.dOS1.play( this.globalNow + 2 );
+        for(const element of this.dOSA){
+            element.play( this.globalNow + randomFloat( 0 , 5 ) );
+        }
 
     }
 
@@ -1214,6 +1223,8 @@ class DelayOsc extends Piece {
     }
 
     load15ArgsB( fund , iArray , modRate , envelopeRate , modWidth , gainVal ) {
+
+        console.log( `fund: ${fund} , iArray: ${iArray} , modRate: ${modRate} , envelopeRate: ${envelopeRate} ,  modWidth: ${modWidth} , gainVal: ${gainVal}`);
 
         this.fund = fund;
 
