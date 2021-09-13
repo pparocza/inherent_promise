@@ -70,14 +70,12 @@ class Piece {
 
     loadLoad15Experiments(){
 
-        this.loadLoad15ExperimentsPercussion();
         this.loadLoad15ExperimentsSus();
 
     }
 
     startLoad15Experiments(){
 
-        this.startLoad15ExperimentsPercussion();
         this.startLoad15ExperimentsSus();
 
     }
