@@ -27,8 +27,7 @@ class Piece {
 
     load(){
 
-        this.dO1 = new DelayOsc( this );
-        this.dO1.load11();
+        this.loadLoad15Experiments();
 
     }
 
@@ -36,9 +35,27 @@ class Piece {
 
         this.fadeFilter.start(1, 50);
 		this.globalNow = audioCtx.currentTime;
+        
+        this.startLoad15Experiments();
 
-        this.dO1.play();
+    }
 
+    loadLoad15Experiments(){
+
+        const onsetRate = 0.25;
+
+        // fund , iArray , modRate , envelopeRate , modWidth
+
+        // ORIGINAL load15
+        this.dO1 = new DelayOsc( this );
+        this.dO1.load15Args( 20 , [ M7 ] , 80 , onsetRate , 400 );
+
+
+    }
+
+    startLoad15Experiments(){
+
+        this.dO1.play( this.globalNow + 0 );
 
     }
 
@@ -666,18 +683,467 @@ class DelayOsc extends Piece {
 
     }
 
-    play() {
+    load12() {
 
-        this.oB.start();
-        this.dB.start();
-        this.dBGO.start();
+        this.fund = 1000;
+
+        this.d1 = new MyDelay( 0 , 0);
+
+        this.oB = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+        
+        this.oB.sine( M2 , 1 ).fill( 0 );
+        this.oB.sine( M3 , 1 ).fill( 0 );
+        this.oB.sine( P5 , 1 ).fill( 0 );
+        this.oB.sine( M6 , 1 ).fill( 0 );
+        this.oB.sine( M7 , 1 ).fill( 0 );
+
+        this.oB.normalize( -1 , 1 );
+
+        this.oB.playbackRate = this.fund;
+        this.oB.loop = true;
+
+        this.dB = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+
+        for( let i = 0 ; i < 10 ; i++ ){
+
+            this.dB.fm( this.fund * randomArrayValue( [ 1 , P5 , 2 ] ) , this.fund * randomArrayValue( [ 1 , P5 , 2 ] ) , randomInt( 0.1 , 0.25 ) , randomFloat( 0.1 , 1 ) ).add( 0 );
+
+        }
+
+        this.dB.normalize( -1 , 1 );
+
+        this.dB.constant( 1 ).add( 0 );
+        this.dB.constant( 0.03125 ).multiply( 0 );
+        this.dB.playbackRate = 20;
+        this.dB.loop = true;
+
+        this.dBG = new MyGain( 0 );
+        this.dBGO = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+        this.dBGO.ramp( 0 , 1 , 0.01 , 0.015 , 0.5 , 8 ).add( 0 );
+        this.dBGO.playbackRate = 0.25;
+        this.dBGO.loop = true;
+
+        this.dB.connect( this.dBG ); this.dBGO.connect( this.dBG.gain.gain );
+        this.dBG.connect( this.d1.delay.delayTime );
+        this.oB.connect( this.d1 );
+
+        this.fO = new MyOsc( 'sine' , 0 );
+        this.fOG = new MyGain( 400 );
+
+        this.aG = new MyGain( 0 );
+
+        // CONNECTIONS
+
+        this.d1.connect( this.fOG );
+        this.fOG.connect( this.fO.frequencyInlet );
+        this.fO.connect( this.aG ); this.dBGO.connect( this.aG.gain.gain );
+        this.aG.connect( this.output );
+
+        this.output.gain.gain.value = 0.15;
+
+    }
+
+    load13() {
+
+        this.fund = 1000;
+
+        this.d1 = new MyDelay( 0 , 0);
+
+        this.oB = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+        
+        this.oB.sine( M2 , 1 ).fill( 0 );
+        this.oB.sine( M3 , 1 ).fill( 0 );
+        this.oB.sine( P5 , 1 ).fill( 0 );
+        this.oB.sine( M6 , 1 ).fill( 0 );
+        this.oB.sine( M7 , 1 ).fill( 0 );
+
+        this.oB.normalize( -1 , 1 );
+
+        this.oB.playbackRate = this.fund;
+        this.oB.loop = true;
+
+        this.dB = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+
+        for( let i = 0 ; i < 10 ; i++ ){
+
+            this.dB.fm( this.fund * randomArrayValue( [ 1 , P5 , 2 ] ) , this.fund * randomArrayValue( [ 1 , P5 , 2 ] ) , randomInt( 0.1 , 0.25 ) , randomFloat( 0.1 , 1 ) ).add( 0 );
+
+        }
+
+        this.dB.normalize( -1 , 1 );
+
+        this.dB.constant( 1 ).add( 0 );
+        this.dB.constant( 0.03125 ).multiply( 0 );
+        this.dB.playbackRate = 80;
+        this.dB.loop = true;
+
+        this.dBG = new MyGain( 0 );
+        this.dBGO = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+        this.dBGO.ramp( 0 , 1 , 0.01 , 0.015 , 0.5 , 8 ).add( 0 );
+        this.dBGO.playbackRate = 0.25;
+        this.dBGO.loop = true;
+
+        this.dB.connect( this.dBG ); this.dBGO.connect( this.dBG.gain.gain );
+        this.dBG.connect( this.d1.delay.delayTime );
+        this.oB.connect( this.d1 );
+
+        this.fO = new MyOsc( 'sine' , 0 );
+        this.fOG = new MyGain( 400 );
+
+        this.aG = new MyGain( 0 );
+
+        this.d = new Effect();
+        this.d.randomShortDelay();
+        this.d.on();
+        this.d.output.gain.value = 0.5;
+
+        this.c = new MyConvolver();
+        this.cB = new MyBuffer2( 2 , 2 , audioCtx.sampleRate );
+        this.cB.noise().add( 0 );
+        this.cB.noise().add( 1 );
+        this.cB.ramp( 0 , 1 , 0.01 , 0.015 , 0.1 , 3 ).multiply( 0 );
+        this.cB.ramp( 0 , 1 , 0.01 , 0.015 , 0.1 , 3 ).multiply( 1 );
+        this.c.setBuffer( this.cB.buffer );
+
+        // CONNECTIONS
+
+        this.d1.connect( this.fOG );
+        this.fOG.connect( this.fO.frequencyInlet );
+        this.fO.connect( this.aG ); this.dBGO.connect( this.aG.gain.gain );
+        this.aG.connect( this.output );
+
+        this.aG.connect( this.d );
+        this.d.connect( this.output );
+
+        this.aG.connect( this.c );
+        this.c.connect( this.output );
+
+        this.output.gain.gain.value = 0.15;
+
+    }
+
+    load14() {
+
+        this.fund = 100;
+
+        this.d1 = new MyDelay( 0 , 0);
+
+        this.oB = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+        
+        this.oB.sine( M2 , 1 ).fill( 0 );
+        this.oB.sine( M3 , 1 ).fill( 0 );
+        this.oB.sine( P5 , 1 ).fill( 0 );
+        this.oB.sine( M6 , 1 ).fill( 0 );
+        this.oB.sine( M7 , 1 ).fill( 0 );
+
+        this.oB.normalize( -1 , 1 );
+
+        this.oB.playbackRate = this.fund;
+        this.oB.loop = true;
+
+        this.dB = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+
+        for( let i = 0 ; i < 10 ; i++ ){
+
+            this.dB.fm( this.fund * randomArrayValue( [ 1 , P5 , 2 ] ) , this.fund * randomArrayValue( [ 1 , P5 , 2 ] ) , randomInt( 0.1 , 0.25 ) , randomFloat( 0.1 , 1 ) ).add( 0 );
+
+        }
+
+        this.dB.normalize( -1 , 1 );
+
+        this.dB.constant( 1 ).add( 0 );
+        this.dB.constant( 0.03125 ).multiply( 0 );
+        this.dB.playbackRate = 80;
+        this.dB.loop = true;
+
+        this.dBG = new MyGain( 0 );
+        this.dBGO = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+        this.dBGO.ramp( 0 , 1 , 0.01 , 0.015 , 0.5 , 8 ).add( 0 );
+        this.dBGO.playbackRate = 0.25;
+        this.dBGO.loop = true;
+
+        this.dB.connect( this.dBG ); this.dBGO.connect( this.dBG.gain.gain );
+        this.dBG.connect( this.d1.delay.delayTime );
+        this.oB.connect( this.d1 );
+
+        this.fO = new MyOsc( 'sine' , 0 );
+        this.fOG = new MyGain( 400 );
+
+        this.aG = new MyGain( 0 );
+
+        this.d = new Effect();
+        this.d.randomShortDelay();
+        this.d.on();
+        this.d.output.gain.value = 0.5;
+
+        this.c = new MyConvolver();
+        this.cB = new MyBuffer2( 2 , 2 , audioCtx.sampleRate );
+        this.cB.noise().add( 0 );
+        this.cB.noise().add( 1 );
+        this.cB.ramp( 0 , 1 , 0.01 , 0.015 , 0.1 , 3 ).multiply( 0 );
+        this.cB.ramp( 0 , 1 , 0.01 , 0.015 , 0.1 , 3 ).multiply( 1 );
+        this.c.setBuffer( this.cB.buffer );
+
+        // CONNECTIONS
+
+        this.d1.connect( this.fOG );
+        this.fOG.connect( this.fO.frequencyInlet );
+        this.fO.connect( this.aG ); this.dBGO.connect( this.aG.gain.gain );
+        this.aG.connect( this.output );
+
+        this.aG.connect( this.d );
+        this.d.connect( this.output );
+
+        this.aG.connect( this.c );
+        this.c.connect( this.output );
+
+        this.output.gain.gain.value = 0.15;
+
+    }
+
+    load15() {
+
+        this.fund = 20;
+
+        this.d1 = new MyDelay( 0 , 0);
+
+        this.oB = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+        
+        this.oB.sine( M7 , 1 ).fill( 0 );
+
+        this.oB.normalize( -1 , 1 );
+
+        this.oB.playbackRate = this.fund;
+        this.oB.loop = true;
+
+        this.dB = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+
+        for( let i = 0 ; i < 10 ; i++ ){
+
+            this.dB.fm( this.fund * randomArrayValue( [ 1 , P5 , 2 ] ) , this.fund * randomArrayValue( [ 1 , P5 , 2 ] ) , randomInt( 0.1 , 0.25 ) , randomFloat( 0.1 , 1 ) ).add( 0 );
+
+        }
+
+        this.dB.normalize( -1 , 1 );
+
+        this.dB.constant( 1 ).add( 0 );
+        this.dB.constant( 0.03125 ).multiply( 0 );
+        this.dB.playbackRate = 80;
+        this.dB.loop = true;
+
+        this.dBG = new MyGain( 0 );
+        this.dBGO = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+        this.dBGO.ramp( 0 , 1 , 0.01 , 0.015 , 0.5 , 8 ).add( 0 );
+        this.dBGO.playbackRate = 0.25;
+        this.dBGO.loop = true;
+
+        this.dB.connect( this.dBG ); this.dBGO.connect( this.dBG.gain.gain );
+        this.dBG.connect( this.d1.delay.delayTime );
+        this.oB.connect( this.d1 );
+
+        this.fO = new MyOsc( 'sine' , 0 );
+        this.fOG = new MyGain( 400 );
+
+        this.aG = new MyGain( 0 );
+
+        this.d = new Effect();
+        this.d.randomShortDelay();
+        this.d.on();
+        this.d.output.gain.value = 0.5;
+
+        this.c = new MyConvolver();
+        this.cB = new MyBuffer2( 2 , 2 , audioCtx.sampleRate );
+        this.cB.noise().add( 0 );
+        this.cB.noise().add( 1 );
+        this.cB.ramp( 0 , 1 , 0.01 , 0.015 , 0.1 , 3 ).multiply( 0 );
+        this.cB.ramp( 0 , 1 , 0.01 , 0.015 , 0.1 , 3 ).multiply( 1 );
+        this.c.setBuffer( this.cB.buffer );
+
+        // CONNECTIONS
+
+        this.d1.connect( this.fOG );
+        this.fOG.connect( this.fO.frequencyInlet );
+        this.fO.connect( this.aG ); this.dBGO.connect( this.aG.gain.gain );
+        this.aG.connect( this.output );
+
+        this.aG.connect( this.d );
+        this.d.connect( this.output );
+
+        this.aG.connect( this.c );
+        this.c.connect( this.output );
+
+        this.output.gain.gain.value = 0.15;
+
+    }
+
+    load16() {
+
+        this.fund = 200;
+
+        this.d1 = new MyDelay( 0 , 0);
+
+        this.oB = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+        
+        this.oB.sine( M2 , 1 ).fill( 0 );
+        this.oB.sine( M3 , 1 ).fill( 0 );
+        this.oB.sine( P5 , 1 ).fill( 0 );
+        this.oB.sine( M6 , 1 ).fill( 0 );
+        this.oB.sine( M7 , 1 ).fill( 0 );
+
+        this.oB.normalize( -1 , 1 );
+
+        this.oB.playbackRate = this.fund;
+        this.oB.loop = true;
+
+        this.dB = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+
+        for( let i = 0 ; i < 10 ; i++ ){
+
+            this.dB.fm( this.fund * randomArrayValue( [ 1 , P5 , 2 ] ) , this.fund * randomArrayValue( [ 1 , P5 , 2 ] ) , randomInt( 0.1 , 0.25 ) , randomFloat( 0.1 , 1 ) ).add( 0 );
+
+        }
+
+        this.dB.normalize( -1 , 1 );
+
+        this.dB.constant( 1 ).add( 0 );
+        this.dB.constant( 0.03125 ).multiply( 0 );
+        this.dB.playbackRate = 80;
+        this.dB.loop = true;
+
+        this.dBG = new MyGain( 0 );
+        this.dBGO = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+        this.dBGO.ramp( 0 , 1 , 0.01 , 0.015 , 0.5 , 8 ).add( 0 );
+        this.dBGO.playbackRate = 0.25;
+        this.dBGO.loop = true;
+
+        this.dB.connect( this.dBG ); this.dBGO.connect( this.dBG.gain.gain );
+        this.dBG.connect( this.d1.delay.delayTime );
+        this.oB.connect( this.d1 );
+
+        this.fO = new MyOsc( 'sine' , 0 );
+        this.fOG = new MyGain( 400 );
+
+        this.aG = new MyGain( 0 );
+
+        this.d = new Effect();
+        this.d.randomShortDelay();
+        this.d.on();
+        this.d.output.gain.value = 0.5;
+
+        this.c = new MyConvolver();
+        this.cB = new MyBuffer2( 2 , 2 , audioCtx.sampleRate );
+        this.cB.noise().add( 0 );
+        this.cB.noise().add( 1 );
+        this.cB.ramp( 0 , 1 , 0.01 , 0.015 , 0.1 , 3 ).multiply( 0 );
+        this.cB.ramp( 0 , 1 , 0.01 , 0.015 , 0.1 , 3 ).multiply( 1 );
+        this.c.setBuffer( this.cB.buffer );
+
+        // CONNECTIONS
+
+        this.d1.connect( this.fOG );
+        this.fOG.connect( this.fO.frequencyInlet );
+        this.fO.connect( this.aG ); this.dBGO.connect( this.aG.gain.gain );
+        this.aG.connect( this.output );
+
+        this.aG.connect( this.d );
+        this.d.connect( this.output );
+
+        this.aG.connect( this.c );
+        this.c.connect( this.output );
+
+        this.output.gain.gain.value = 0.15;
+
+    }
+
+    load15Args( fund , iArray , modRate , envelopeRate , modWidth ) {
+
+        this.fund = fund;
+
+        this.d1 = new MyDelay( 0 , 0);
+
+        this.oB = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+
+        for(const interval of iArray){
+            this.oB.sine( interval , 1 ).add( 0 );
+        }
+    
+        this.oB.normalize( -1 , 1 );
+
+        this.oB.playbackRate = this.fund;
+        this.oB.loop = true;
+
+        this.dB = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+
+        for( let i = 0 ; i < 10 ; i++ ){
+
+            this.dB.fm( this.fund * randomArrayValue( [ 1 , P5 , 2 ] ) , this.fund * randomArrayValue( [ 1 , P5 , 2 ] ) , randomInt( 0.1 , 0.25 ) , randomFloat( 0.1 , 1 ) ).add( 0 );
+
+        }
+
+        this.dB.normalize( -1 , 1 );
+
+        this.dB.constant( 1 ).add( 0 );
+        this.dB.constant( 0.03125 ).multiply( 0 );
+        this.dB.playbackRate = modRate;
+        this.dB.loop = true;
+
+        this.dBG = new MyGain( 0 );
+        this.dBGO = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+        this.dBGO.ramp( 0 , 1 , 0.01 , 0.015 , 0.5 , 8 ).add( 0 );
+        this.dBGO.playbackRate = envelopeRate;
+        this.dBGO.loop = true;
+
+        this.dB.connect( this.dBG ); this.dBGO.connect( this.dBG.gain.gain );
+        this.dBG.connect( this.d1.delay.delayTime );
+        this.oB.connect( this.d1 );
+
+        this.fO = new MyOsc( 'sine' , 0 );
+        this.fOG = new MyGain( modWidth );
+
+        this.aG = new MyGain( 0 );
+
+        this.d = new Effect();
+        this.d.randomShortDelay();
+        this.d.on();
+        this.d.output.gain.value = 0.5;
+
+        this.c = new MyConvolver();
+        this.cB = new MyBuffer2( 2 , 2 , audioCtx.sampleRate );
+        this.cB.noise().add( 0 );
+        this.cB.noise().add( 1 );
+        this.cB.ramp( 0 , 1 , 0.01 , 0.015 , 0.1 , 3 ).multiply( 0 );
+        this.cB.ramp( 0 , 1 , 0.01 , 0.015 , 0.1 , 3 ).multiply( 1 );
+        this.c.setBuffer( this.cB.buffer );
+
+        // CONNECTIONS
+
+        this.d1.connect( this.fOG );
+        this.fOG.connect( this.fO.frequencyInlet );
+        this.fO.connect( this.aG ); this.dBGO.connect( this.aG.gain.gain );
+        this.aG.connect( this.output );
+
+        this.aG.connect( this.d );
+        this.d.connect( this.output );
+
+        this.aG.connect( this.c );
+        this.c.connect( this.output );
+
+        this.output.gain.gain.value = 0.15;
+
+    }
+
+    play( startTime ) {
+
+        this.oB.startAtTime( startTime );
+        this.dB.startAtTime( startTime );
+        this.dBGO.startAtTime( startTime );
 
         if( this.aB ){
-            this.aB.start();
+            this.aB.startAtTime( startTime );
         }
 
         if( this.fO ){
-            this.fO.start();
+            this.fO.startAtTime( startTime );
         }
 
     }
