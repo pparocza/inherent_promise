@@ -55,8 +55,7 @@ class Piece {
 
     load(){
 
-        this.loadLoad15ExperimentsPercussion();
-        this.loadLoad15ExperimentsSus();
+        this.loadLoad15Experiments();
 
     }
 
@@ -65,6 +64,19 @@ class Piece {
         this.fadeFilter.start(1, 50);
 		this.globalNow = audioCtx.currentTime;
         
+        this.startLoad15Experiments();
+
+    }
+
+    loadLoad15Experiments(){
+
+        this.loadLoad15ExperimentsPercussion();
+        this.loadLoad15ExperimentsSus();
+
+    }
+
+    startLoad15Experiments(){
+
         this.startLoad15ExperimentsPercussion();
         this.startLoad15ExperimentsSus();
 
@@ -123,7 +135,7 @@ class Piece {
         // fund , iArray , modRate , envelopeRate , modWidth , gainVal
 
         this.dOS1 = new DelayOsc( this );
-        this.dOS1.load15ArgsB( 80 , [ M7 , M3 , P5 ] , 80 , onsetRate , 400 , gainVal );
+        this.dOS1.load15ArgsB( 80 , [ 1 , 1.1 , 1.2 , 1.3 , 1.4 ] , 40 , onsetRate , 2000 , gainVal * 0.3 );
 
     }
 
