@@ -37,7 +37,7 @@ class Piece {
         this.cSendIn.connect( this.cSend );
         this.cSend.connect( this.masterGain );
 
-        // DELAY
+        // DELAY 1
 
         this.dSend = new Effect();
         this.dSend.randomShortDelay();
@@ -49,7 +49,21 @@ class Piece {
         this.dSendIn.connect( this.dSend );
         this.dSend.connect( this.masterGain );
 
-        this.dSend.connect( this.cSendIn );
+        // this.dSend.connect( this.cSendIn );
+
+        // DELAY 2
+
+        this.dSend2 = new Effect();
+        this.dSend2.randomEcho();
+        this.dSend2.on();
+        this.dSend2.output.gain.value = 1;
+
+        this.dSend2In = new MyGain( 1 );
+
+        this.dSend2In.connect( this.dSend2 );
+        this.dSend2.connect( this.masterGain );
+
+        this.dSend2.connect( this.cSendIn );
 
     }
 
@@ -127,9 +141,10 @@ class Piece {
 
     loadLoad15ExperimentsSus(){
 
-        const onsetRate = 0.25;
-        const nDOS = 4;
-        const gainVal = 0.15 / nDOS;
+        const onsetRate = 1;
+        const fArray = [ 40 , 80 , 30 , 20 , 50 ];
+        const nDOS = fArray.length;
+        const gainVal = 1 / nDOS;
 
         this.dOSA = [];
 
@@ -138,7 +153,7 @@ class Piece {
         for( let i = 0 ; i < nDOS ; i++ ){
 
             this.dOSA[i] = new DelayOsc( this );
-            this.dOSA[i].load15ArgsB( randomFloat( 20 , 1000 ) , [ 1 , 1.1 , 1.2 , 1.3 , 1.4 ] , randomFloat( 40 , 200 ) , onsetRate * randomFloat( 0.125 , 1 ) , randomFloat( 400 , 2000 ) , gainVal );
+            this.dOSA[i].load15ArgsB( fArray[ i ] , [ 1 , 2 ] , randomFloat( 40 , 60 ) , randomFloat( 0.5 , 4 ) , randomFloat( 400 , 800 ) , gainVal );
 
         }
 
@@ -160,8 +175,22 @@ class Piece {
 
     startLoad15ExperimentsSus(){
 
+        const pL = 20;
+        let t = 0;
+
         for(const element of this.dOSA){
-            element.play( this.globalNow + randomFloat( 0 , 5 ) );
+
+            for( let i = 1 ; i < pL ; i++ ){
+
+                t = this.globalNow + i * randomFloat( 2 , 5 );
+                element.play( t );
+                element.output.gain.gain.setValueAtTime( randomFloat( 0.5 , 1.5 ) / this.dOSA.length  , t );
+                element.p.setPositionAtTime( randomFloat( -0.75 , 0.75 ) , t );
+                element.dBGO.bufferSource.playbackRate.setValueAtTime( randomFloat( 0.5 , 4 ) , t );
+                element.dB.bufferSource.playbackRate.setValueAtTime( randomFloat( 1 , 1000 ) , t );
+
+            }
+
         }
 
     }
@@ -184,8 +213,9 @@ class DelayOsc extends Piece {
         this.output = new MyGain ( 0 );
 
         this.output.connect( piece.masterGain );
-        this.output.connect( piece.cSendIn );
+        // this.output.connect( piece.cSendIn );
         this.output.connect( piece.dSendIn );
+        // this.output.connect( piece.dSend2In );
 
     }
 
@@ -1260,7 +1290,7 @@ class DelayOsc extends Piece {
         this.dBGO = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
         this.dBGO.ramp( 0 , 1 , 0.5 , 0.5 , 1 , 1 ).add( 0 );
         this.dBGO.playbackRate = envelopeRate;
-        this.dBGO.loop = true;
+        // this.dBGO.loop = true;
 
         this.dB.connect( this.dBG ); this.dBGO.connect( this.dBG.gain.gain );
         this.dBG.connect( this.d1.delay.delayTime );
@@ -1271,30 +1301,27 @@ class DelayOsc extends Piece {
 
         this.aG = new MyGain( 0 );
 
+        this.p = new MyPanner2( 0 );
+
         // CONNECTIONS
 
         this.d1.connect( this.fOG );
         this.fOG.connect( this.fO.frequencyInlet );
         this.fO.connect( this.aG ); this.dBGO.connect( this.aG.gain.gain );
-        this.aG.connect( this.output );
+        this.aG.connect( this.p );
+        this.p.connect( this.output );
 
         this.output.gain.gain.value = gainVal;
+
+        this.oB.start();
+        this.dB.start();
+        this.fO.start();
 
     }
 
     play( startTime ) {
 
-        this.oB.startAtTime( startTime );
-        this.dB.startAtTime( startTime );
         this.dBGO.startAtTime( startTime );
-
-        if( this.aB ){
-            this.aB.startAtTime( startTime );
-        }
-
-        if( this.fO ){
-            this.fO.startAtTime( startTime );
-        }
 
     }
 
