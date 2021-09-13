@@ -22,6 +22,21 @@ class Piece {
 
     initFXChannels(){
 
+        // REVERB 
+
+        this.cSend = new MyConvolver();
+        this.cSendB = new MyBuffer2( 2 , 2 , audioCtx.sampleRate );
+        this.cSendB.noise().add( 0 );
+        this.cSendB.noise().add( 1 );
+        this.cSendB.ramp( 0 , 1 , 0.01 , 0.015 , 0.1 , 3 ).multiply( 0 );
+        this.cSendB.ramp( 0 , 1 , 0.01 , 0.015 , 0.1 , 3 ).multiply( 1 );
+        this.cSend.setBuffer( this.cSendB.buffer );
+
+        this.cSendIn = new MyGain( 1 );
+
+        this.cSendIn.connect( this.cSend );
+        this.cSend.connect( this.masterGain );
+
 
     }
 
@@ -43,12 +58,21 @@ class Piece {
     loadLoad15Experiments(){
 
         const onsetRate = 0.25;
+        const gainVal = 0.15
 
-        // fund , iArray , modRate , envelopeRate , modWidth
+        // fund , iArray , modRate , envelopeRate , modWidth , gainVal
 
         // ORIGINAL load15
         this.dO1 = new DelayOsc( this );
-        this.dO1.load15Args( 20 , [ M7 ] , 80 , onsetRate , 400 );
+        this.dO1.load15Args( 20 , [ M7 ] , 80 , onsetRate , 400 , gainVal );
+
+        // 2
+        this.dO2 = new DelayOsc( this );
+        this.dO2.load15Args( 200 , [ M7 ] , 80 , onsetRate * 4 , 400 , gainVal );
+
+        // 3
+        this.dO3 = new DelayOsc( this );
+        this.dO3.load15Args( 200 , [ M7 , M3 ] , 80 , onsetRate * 1 , 400 , gainVal );
 
 
     }
@@ -56,6 +80,8 @@ class Piece {
     startLoad15Experiments(){
 
         this.dO1.play( this.globalNow + 0 );
+        this.dO2.play( this.globalNow + 0 );
+        this.dO3.play( this.globalNow + 1 );
 
     }
 
@@ -77,6 +103,7 @@ class DelayOsc extends Piece {
         this.output = new MyGain ( 0 );
 
         this.output.connect( piece.masterGain );
+        this.output.connect( piece.cSendIn );
 
     }
 
@@ -1055,7 +1082,7 @@ class DelayOsc extends Piece {
 
     }
 
-    load15Args( fund , iArray , modRate , envelopeRate , modWidth ) {
+    load15Args( fund , iArray , modRate , envelopeRate , modWidth , gainVal ) {
 
         this.fund = fund;
 
@@ -1107,14 +1134,6 @@ class DelayOsc extends Piece {
         this.d.on();
         this.d.output.gain.value = 0.5;
 
-        this.c = new MyConvolver();
-        this.cB = new MyBuffer2( 2 , 2 , audioCtx.sampleRate );
-        this.cB.noise().add( 0 );
-        this.cB.noise().add( 1 );
-        this.cB.ramp( 0 , 1 , 0.01 , 0.015 , 0.1 , 3 ).multiply( 0 );
-        this.cB.ramp( 0 , 1 , 0.01 , 0.015 , 0.1 , 3 ).multiply( 1 );
-        this.c.setBuffer( this.cB.buffer );
-
         // CONNECTIONS
 
         this.d1.connect( this.fOG );
@@ -1125,10 +1144,7 @@ class DelayOsc extends Piece {
         this.aG.connect( this.d );
         this.d.connect( this.output );
 
-        this.aG.connect( this.c );
-        this.c.connect( this.output );
-
-        this.output.gain.gain.value = 0.15;
+        this.output.gain.gain.value = gainVal;
 
     }
 
