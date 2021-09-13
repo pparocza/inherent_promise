@@ -37,12 +37,26 @@ class Piece {
         this.cSendIn.connect( this.cSend );
         this.cSend.connect( this.masterGain );
 
+        // DELAY
+
+        this.dSend = new Effect();
+        this.dSend.randomShortDelay();
+        this.dSend.on();
+        this.dSend.output.gain.value = 1;
+
+        this.dSendIn = new MyGain( 0.75 );
+
+        this.dSendIn.connect( this.dSend );
+        this.dSend.connect( this.masterGain );
+
+        this.dSend.connect( this.cSendIn );
 
     }
 
     load(){
 
-        this.loadLoad15Experiments();
+        this.loadLoad15ExperimentsPercussion();
+        this.loadLoad15ExperimentsSus();
 
     }
 
@@ -51,11 +65,12 @@ class Piece {
         this.fadeFilter.start(1, 50);
 		this.globalNow = audioCtx.currentTime;
         
-        this.startLoad15Experiments();
+        this.startLoad15ExperimentsPercussion();
+        this.startLoad15ExperimentsSus();
 
     }
 
-    loadLoad15Experiments(){
+    loadLoad15ExperimentsPercussion(){
 
         const onsetRate = 0.25;
         const gainVal = 0.15
@@ -98,10 +113,21 @@ class Piece {
         this.dO9 = new DelayOsc( this );
         this.dO9.load15Args( 1000 , [ 1 , 3.3 , 5.7 , 11.5 , 13 ] , 320 , onsetRate * 8 , 56000 , gainVal * 0.05 );
 
+    }
+
+    loadLoad15ExperimentsSus(){
+
+        const onsetRate = 0.25;
+        const gainVal = 0.15
+
+        // fund , iArray , modRate , envelopeRate , modWidth , gainVal
+
+        this.dOS1 = new DelayOsc( this );
+        this.dOS1.load15ArgsB( 80 , [ M7 , M3 , P5 ] , 80 , onsetRate , 400 , gainVal );
 
     }
 
-    startLoad15Experiments(){
+    startLoad15ExperimentsPercussion(){
 
         this.dO1.play( this.globalNow + 0 );
         this.dO2.play( this.globalNow + 0 );
@@ -112,6 +138,12 @@ class Piece {
         this.dO7.play( this.globalNow + 0.5 );
         this.dO8.play( this.globalNow + 0.5 );
         this.dO9.play( this.globalNow + 0.25 );
+
+    }
+
+    startLoad15ExperimentsSus(){
+
+        this.dOS1.play( this.globalNow + 2 );
 
     }
 
@@ -134,6 +166,7 @@ class DelayOsc extends Piece {
 
         this.output.connect( piece.masterGain );
         this.output.connect( piece.cSendIn );
+        this.output.connect( piece.dSendIn );
 
     }
 
@@ -1159,20 +1192,12 @@ class DelayOsc extends Piece {
 
         this.aG = new MyGain( 0 );
 
-        this.d = new Effect();
-        this.d.randomShortDelay();
-        this.d.on();
-        this.d.output.gain.value = 0.5;
-
         // CONNECTIONS
 
         this.d1.connect( this.fOG );
         this.fOG.connect( this.fO.frequencyInlet );
         this.fO.connect( this.aG ); this.dBGO.connect( this.aG.gain.gain );
         this.aG.connect( this.output );
-
-        this.aG.connect( this.d );
-        this.d.connect( this.output );
 
         this.output.gain.gain.value = gainVal;
 
@@ -1212,7 +1237,7 @@ class DelayOsc extends Piece {
 
         this.dBG = new MyGain( 0 );
         this.dBGO = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
-        this.dBGO.ramp( 0 , 1 , 0.01 , 0.015 , 0.5 , 8 ).add( 0 );
+        this.dBGO.ramp( 0 , 1 , 0.5 , 0.5 , 1 , 1 ).add( 0 );
         this.dBGO.playbackRate = envelopeRate;
         this.dBGO.loop = true;
 
@@ -1225,20 +1250,12 @@ class DelayOsc extends Piece {
 
         this.aG = new MyGain( 0 );
 
-        this.d = new Effect();
-        this.d.randomShortDelay();
-        this.d.on();
-        this.d.output.gain.value = 0.5;
-
         // CONNECTIONS
 
         this.d1.connect( this.fOG );
         this.fOG.connect( this.fO.frequencyInlet );
         this.fO.connect( this.aG ); this.dBGO.connect( this.aG.gain.gain );
         this.aG.connect( this.output );
-
-        this.aG.connect( this.d );
-        this.d.connect( this.output );
 
         this.output.gain.gain.value = gainVal;
 
