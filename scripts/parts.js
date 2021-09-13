@@ -74,6 +74,30 @@ class Piece {
         this.dO3 = new DelayOsc( this );
         this.dO3.load15Args( 200 , [ M7 , M3 ] , 80 , onsetRate * 1 , 400 , gainVal );
 
+        // 4
+        this.dO4 = new DelayOsc( this );
+        this.dO4.load15Args( 1000 , [ M7 , M3 , M2 , P5 ] , 160 , onsetRate * 8 , 1600 , gainVal * 0.3 );
+
+        // 5
+        this.dO5 = new DelayOsc( this );
+        this.dO5.load15Args( 5000 , [ M7 , M3 , M2 , P5 , 1 , 2 , 2.4 , 7 ] , 800 , onsetRate * 32 , 1600 , gainVal * 0.15 );
+
+        // 6
+        this.dO6 = new DelayOsc( this );
+        this.dO6.load15Args( 10000 , [ 1 , 2 , 2.4 , 7 ] , 800 , onsetRate * 2 , 3200 , gainVal * 0.3 );
+
+        // 7
+        this.dO7 = new DelayOsc( this );
+        this.dO7.load15Args( 8000 , [ 1 , 2 , 3.4 , 7 , 11 ] , 2000 , onsetRate * 4 , 3200 , gainVal * 0.3 );
+
+        // 8
+        this.dO8 = new DelayOsc( this );
+        this.dO8.load15Args( 500 , [ 1 ] , 160 , onsetRate * 8 , 3200 , gainVal * 0.2 );
+
+        // 9
+        this.dO9 = new DelayOsc( this );
+        this.dO9.load15Args( 1000 , [ 1 , 3.3 , 5.7 , 11.5 , 13 ] , 320 , onsetRate * 8 , 56000 , gainVal * 0.05 );
+
 
     }
 
@@ -82,6 +106,12 @@ class Piece {
         this.dO1.play( this.globalNow + 0 );
         this.dO2.play( this.globalNow + 0 );
         this.dO3.play( this.globalNow + 1 );
+        this.dO4.play( this.globalNow + 0.25 );
+        this.dO5.play( this.globalNow + 0 );
+        this.dO6.play( this.globalNow + 0.5 );
+        this.dO7.play( this.globalNow + 0.5 );
+        this.dO8.play( this.globalNow + 0.5 );
+        this.dO9.play( this.globalNow + 0.25 );
 
     }
 
@@ -1083,6 +1113,72 @@ class DelayOsc extends Piece {
     }
 
     load15Args( fund , iArray , modRate , envelopeRate , modWidth , gainVal ) {
+
+        this.fund = fund;
+
+        this.d1 = new MyDelay( 0 , 0);
+
+        this.oB = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+
+        for(const interval of iArray){
+            this.oB.sine( interval , 1 ).add( 0 );
+        }
+    
+        this.oB.normalize( -1 , 1 );
+
+        this.oB.playbackRate = this.fund;
+        this.oB.loop = true;
+
+        this.dB = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+
+        for( let i = 0 ; i < 10 ; i++ ){
+
+            this.dB.fm( this.fund * randomArrayValue( [ 1 , P5 , 2 ] ) , this.fund * randomArrayValue( [ 1 , P5 , 2 ] ) , randomInt( 0.1 , 0.25 ) , randomFloat( 0.1 , 1 ) ).add( 0 );
+
+        }
+
+        this.dB.normalize( -1 , 1 );
+
+        this.dB.constant( 1 ).add( 0 );
+        this.dB.constant( 0.03125 ).multiply( 0 );
+        this.dB.playbackRate = modRate;
+        this.dB.loop = true;
+
+        this.dBG = new MyGain( 0 );
+        this.dBGO = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
+        this.dBGO.ramp( 0 , 1 , 0.01 , 0.015 , 0.5 , 8 ).add( 0 );
+        this.dBGO.playbackRate = envelopeRate;
+        this.dBGO.loop = true;
+
+        this.dB.connect( this.dBG ); this.dBGO.connect( this.dBG.gain.gain );
+        this.dBG.connect( this.d1.delay.delayTime );
+        this.oB.connect( this.d1 );
+
+        this.fO = new MyOsc( 'sine' , 0 );
+        this.fOG = new MyGain( modWidth );
+
+        this.aG = new MyGain( 0 );
+
+        this.d = new Effect();
+        this.d.randomShortDelay();
+        this.d.on();
+        this.d.output.gain.value = 0.5;
+
+        // CONNECTIONS
+
+        this.d1.connect( this.fOG );
+        this.fOG.connect( this.fO.frequencyInlet );
+        this.fO.connect( this.aG ); this.dBGO.connect( this.aG.gain.gain );
+        this.aG.connect( this.output );
+
+        this.aG.connect( this.d );
+        this.d.connect( this.output );
+
+        this.output.gain.gain.value = gainVal;
+
+    }
+
+    load15ArgsB( fund , iArray , modRate , envelopeRate , modWidth , gainVal ) {
 
         this.fund = fund;
 
