@@ -9,7 +9,7 @@ class Piece {
         this.globalNow = 0;
 
         this.gain = audioCtx.createGain();
-        this.gain.gain.value = 2;
+        this.gain.gain.value = 3;
     
         this.fadeFilter = new FilterFade(0);
     
@@ -49,7 +49,7 @@ class Piece {
         this.dSendIn.connect( this.dSend );
         this.dSend.connect( this.masterGain );
 
-        // this.dSend.connect( this.cSendIn );
+        this.dSend.connect( this.cSendIn );
 
         // DELAY 2
 
@@ -76,8 +76,8 @@ class Piece {
         this.dS3L2 = new MyBuffer2( 1 , 1 , audioCtx.sampleRate );
         this.dS3L1.noise().fill( 0 );
         this.dS3L2.noise().fill( 0 );
-        this.dS3L1.constant( 0.0325 ).multiply( 0 );
-        this.dS3L2.constant( 0.0325 ).multiply( 0 );
+        this.dS3L1.constant( 0.1 ).multiply( 0 );
+        this.dS3L2.constant( 0.1 ).multiply( 0 );
         this.dS3L1.loop = true;
         this.dS3L2.loop = true;
         this.dS3L1.playbackRate = randomFloat( 0.00001 , 0.000001 );
@@ -89,7 +89,7 @@ class Piece {
         this.dSend3In.connect( this.dSend3 );
         this.dSend3.connect( this.masterGain );
 
-        // this.dSend3.connect( this.cSendIn );
+        this.dSend3.connect( this.cSendIn );
 
         this.dS3L1.start();
         this.dS3L2.start();
@@ -213,7 +213,7 @@ class Piece {
 
                 t = this.globalNow + i * randomFloat( 2 , 5 );
                 element.play( t );
-                element.output.gain.gain.setValueAtTime( randomFloat( 0.25 , 1 ) / this.dOSA.length  , t );
+                element.output.gain.gain.setValueAtTime( randomFloat( 0.25 , 2 ) / this.dOSA.length  , t );
                 element.p.setPositionAtTime( randomFloat( -0.75 , 0.75 ) , t );
                 element.dBGO.bufferSource.playbackRate.setValueAtTime( randomFloat( 0.5 , 4 ) , t );
                 element.dB.bufferSource.playbackRate.setValueAtTime( randomFloat( 1 , 1000 ) , t );
@@ -245,7 +245,7 @@ class DelayOsc extends Piece {
         // this.output.connect( piece.cSendIn );
         this.output.connect( piece.dSendIn );
         // this.output.connect( piece.dSend2In );
-        this.output.connect( piece.dSend3In );
+        // this.output.connect( piece.dSend3In );
 
     }
 
