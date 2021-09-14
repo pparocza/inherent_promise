@@ -184,7 +184,7 @@ class Piece {
 
                 t = this.globalNow + i * randomFloat( 2 , 5 );
                 element.play( t );
-                element.output.gain.gain.setValueAtTime( randomFloat( 0.5 , 1.5 ) / this.dOSA.length  , t );
+                element.output.gain.gain.setValueAtTime( randomFloat( 0.5 , 1 ) / this.dOSA.length  , t );
                 element.p.setPositionAtTime( randomFloat( -0.75 , 0.75 ) , t );
                 element.dBGO.bufferSource.playbackRate.setValueAtTime( randomFloat( 0.5 , 4 ) , t );
                 element.dB.bufferSource.playbackRate.setValueAtTime( randomFloat( 1 , 1000 ) , t );
